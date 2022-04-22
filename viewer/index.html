@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Viewer for surface data</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="favicon.ico" media="(prefers-color-scheme: light)" />
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+        <script type="importmap">
+			{
+				"imports": {
+					"three": "./js/three.module.js",
+                    "STLLoader": "./js/STLLoader.js"
+				}
+			}
+		</script>
+
+	</head>
+	<body>
+        <div id="container">
+            <canvas id="canvas" style="width: 100%; height: 100%;"></canvas>
+        </div>
+
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <script type="module" src="js/all.js"></script>
+    </body>
+</html>
