@@ -86,7 +86,7 @@ jQuery(document).ready(function() {
         				transparent: false,
         				side: THREE.DoubleSide
         			})
-        			stoneMat.needsUpdate = true;
+        			//stoneMat.needsUpdate = true;
 
         			const mesh = new THREE.Mesh(geometry, stoneMat)
         			mesh.scale.set(0.005, 0.005, 0.005);
@@ -101,8 +101,29 @@ jQuery(document).ready(function() {
         					centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
         					centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
         					centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
-        				);
+                        );
+                        pick = 50;
+                        mesh2 = mesh.clone();
+                        mesh2.position.set(
+                        	centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
+                        	centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
+                        	centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
+                        );
+                        scene.add(mesh2);
+                        // add a wireframe geometry to the stone
+                        /*    const wireframe = new THREE.WireframeGeometry(geometry);
 
+                            const line = new THREE.LineSegments(wireframe);
+                            line.material.depthTest = false;
+                            line.material.opacity = 0.25;
+                            line.material.transparent = true;
+                            line.scale.set(0.005, 0.005, 0.005);
+                            line.position.set(centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
+                            	centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
+                            	centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
+                            );
+                            scene.add(line);
+                            */
         			});
         			scene.add(mesh)
         		},
@@ -207,6 +228,14 @@ jQuery(document).ready(function() {
             const mesh = new THREE.Mesh(geometry, material)
             mesh.castShadow = true; //default is false
             mesh.receiveShadow = true; //default
+
+            const wireframe = new THREE.WireframeGeometry(geometry);
+
+            const line = new THREE.LineSegments(wireframe);
+            line.material.depthTest = false;
+            line.material.opacity = 0.25;
+            line.material.transparent = true;
+            scene.add(line);
 
 			scene.add(mesh)
 		},
