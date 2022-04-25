@@ -18,6 +18,11 @@ function animate() {
     requestAnimationFrame(animate);
     if (centerline != null && centerline.length > 0) {
     	camera.position.set(centerline[pos + 1][0], centerline[pos + 1][1], centerline[pos + 1][2]);
+    	//spotLight.position.copy(camera.position);
+    	//hemiLight.position.set(centerline[pos + 1][0],
+    	//	centerline[pos + 1][1], centerline[pos + 1][2])
+    	//spotLight.position.set(centerline[pos + 1][0] + 0.01,
+    	//	centerline[pos + 1][1] + 0.01, centerline[pos + 1][2] + 0.01);
     	camera.lookAt(centerline[pos][0], centerline[pos][1], centerline[pos][2]);
     	//controls.target = new THREE.Vector3(centerline[pos + 1][0], centerline[pos + 1][1], centerline[pos + 1])
     	//spotLight.position.set(centerline[pos + 1][0], centerline[pos + 1][1], centerline[pos + 1][2]);
@@ -25,8 +30,7 @@ function animate() {
     	//spotLight.position.copy(camera.position);
 
     	//spotLight.target.position.set(centerline[pos][0], centerline[pos][1], centerline[pos][2]);
-    	spotLight.lookAt(centerline[pos][0], centerline[pos][1], centerline[pos][2])
-    	spotLight.position.copy(camera.position);
+    	//spotLight.lookAt(centerline[pos][0], centerline[pos][1], centerline[pos][2])
     }
 
     //spotLightHelper.update();
@@ -36,8 +40,8 @@ function animate() {
 	//console.log(camera.position);
     if ((tick % 50) == 0) {
     	pos = (pos + 1) % (centerline.length - 1);
-        console.log(spotLight.position);
-        console.log(camera.position);
+        //console.log(spotLight.position);
+        //console.log(camera.position);
     }
     tick++;
 }
@@ -52,6 +56,7 @@ let centerline = [];
 let pos = 0;
 let spotLight;
 //let spotLightHelper;
+let hemiLight;
 
 jQuery(document).ready(function() {
     // read in the line
@@ -87,9 +92,12 @@ jQuery(document).ready(function() {
         				side: THREE.DoubleSide
         			})
         			//stoneMat.needsUpdate = true;
-
+                    stoneMat = new THREE.MeshPhongMaterial({
+                    	color: 0x444444,
+                    	side: THREE.DoubleSide,
+                    });
         			const mesh = new THREE.Mesh(geometry, stoneMat)
-        			mesh.scale.set(0.005, 0.005, 0.005);
+        			mesh.scale.set(0.01, 0.01, 0.01);
         			mesh.castShadow = true; //default is false
         			mesh.receiveShadow = true; //default
         			// move the mesh to a random position inside the tube
@@ -98,18 +106,18 @@ jQuery(document).ready(function() {
         				// centerline and the stone position
         				let pick = 30; // where to place the stone along the centerline
         				mesh.position.set(
-        					centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
-        					centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
-        					centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
+        					centerline[pick][0] - 0.2 * (data[pick][0] - centerline[pick][0]),
+        						centerline[pick][1] - 0.2 * (data[pick][1] - centerline[pick][1]),
+        						centerline[pick][2] - 0.2 * (data[pick][2] - centerline[pick][2])
                         );
-                        pick = 50;
-                        mesh2 = mesh.clone();
+                        /*pick = 50;
+                        let mesh2 = mesh.clone();
                         mesh2.position.set(
-                        	centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
-                        	centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
-                        	centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
+                        	centerline[pick][0] - 0.2 * (data[pick][0] - centerline[pick][0]),
+                        		centerline[pick][1] - 0.2 * (data[pick][1] - centerline[pick][1]),
+                        		centerline[pick][2] - 0.2 * (data[pick][2] - centerline[pick][2])
                         );
-                        scene.add(mesh2);
+                        scene.add(mesh2);*/
                         // add a wireframe geometry to the stone
                         /*    const wireframe = new THREE.WireframeGeometry(geometry);
 
@@ -135,10 +143,6 @@ jQuery(document).ready(function() {
         		}
         )
     });
-
-	// read in the tube
-	// read in the stone
-
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 	//camera.position.z = 5;
@@ -157,6 +161,7 @@ jQuery(document).ready(function() {
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    renderer.autoClear = false;
 
 	//controls = new OrbitControls(camera, renderer.domElement)
 	//controls.enableDamping = true
@@ -191,25 +196,38 @@ jQuery(document).ready(function() {
         })
     //material.needsUpdate = true;
 
+    material = new THREE.MeshPhongMaterial({
+    	color: 0xff4444,
+    	side: THREE.DoubleSide,
+    });
+
     //let material3 = new THREE.MeshLambertMaterial({
     // 	color: 0xff4444,
     // 	emissive: 0x000000,
     // 	side: THREE.DoubleSide
     //});
+    //hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 0.2);
+    //hemiLight.castShadow = true;
+    //scene.add(hemiLight);
 
 	//light = new THREE.PointLight(0xffffff, 0.5, 100)
 	//light.position.set(0, 0, 0)
     //camera.add(light);
-    spotLight = new THREE.SpotLight(0xffffff, 2.6, 10.5, Math.PI / 5, 0.5, 0.1);
-    //camera.add(spotLight.target);
+    spotLight = new THREE.SpotLight(0xffffff, 1.6, 10.5, Math.PI / 3, 0.5, 0.1);
     spotLight.target.position.set(0, 0, -1);
     spotLight.position.copy(camera.position);
-    //spotLight.castShadow = true;
-    spotLight.shadow.mapSize.width = 1024;
-    spotLight.shadow.mapSize.height = 1024;
-    spotLight.shadow.camera.near = 0.1;
-    spotLight.shadow.camera.far = 100;
-    spotLight.shadow.camera.fov = 75;
+    const shadowCameraSize = 75;
+    spotLight.castShadow = true;
+    //spotLight.shadow.bias = -0.0001;
+    spotLight.shadow.mapSize.width = 1024 * 4;
+    spotLight.shadow.mapSize.height = 1024 * 4;
+    spotLight.shadow.camera.left = -shadowCameraSize;
+    spotLight.shadow.camera.right = shadowCameraSize;
+    spotLight.shadow.camera.top = shadowCameraSize;
+    spotLight.shadow.camera.bottom = -shadowCameraSize;
+    spotLight.shadow.camera.near = 0.01;
+    spotLight.shadow.camera.far = 50;
+    //spotLight.shadow.camera.fov = 30;
 
     //scene.add(spotLight);
     camera.add(spotLight);
@@ -225,18 +243,20 @@ jQuery(document).ready(function() {
         	geometry.computeVertexNormals();
         	//geometry.computeVertexNormals(true);
         	//geometry.computeFlatVertexNormals();
-            const mesh = new THREE.Mesh(geometry, material)
+            const mesh = new THREE.Mesh(geometry, material);
             mesh.castShadow = true; //default is false
             mesh.receiveShadow = true; //default
 
-            const wireframe = new THREE.WireframeGeometry(geometry);
+            let showWireframe = true;
+            if (showWireframe) {
+                const wireframe = new THREE.WireframeGeometry(geometry);
 
-            const line = new THREE.LineSegments(wireframe);
-            line.material.depthTest = false;
-            line.material.opacity = 0.25;
-            line.material.transparent = true;
-            scene.add(line);
-
+                const line = new THREE.LineSegments(wireframe);
+                line.material.depthTest = false;
+                line.material.opacity = 0.25;
+                line.material.transparent = true;
+                scene.add(line);
+            }
 			scene.add(mesh)
 		},
 		(xhr) => {
