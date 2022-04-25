@@ -13,6 +13,9 @@ import {
 
 
 let tick = 0;
+let depthMap = false;
+let showWireframe = true;
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -39,7 +42,8 @@ function animate() {
 	//console.log(light.position);
 	//console.log(camera.position);
     if ((tick % 50) == 0) {
-    	pos = (pos + 1) % (centerline.length - 1);
+        if (pos < 32)
+        	pos = (pos + 1) % (centerline.length - 1);
         //console.log(spotLight.position);
         //console.log(camera.position);
     }
@@ -96,6 +100,11 @@ jQuery(document).ready(function() {
                     	color: 0x444444,
                     	side: THREE.DoubleSide,
                     });
+                    if (depthMap) {
+                    	stoneMat = new THREE.MeshDepthMaterial({
+                    		side: THREE.DoubleSide
+                    	});
+                    }
         			const mesh = new THREE.Mesh(geometry, stoneMat)
         			mesh.scale.set(0.01, 0.01, 0.01);
         			mesh.castShadow = true; //default is false
@@ -200,6 +209,11 @@ jQuery(document).ready(function() {
     	color: 0xff4444,
     	side: THREE.DoubleSide,
     });
+    if (depthMap) {
+    	material = new THREE.MeshDepthMaterial({
+    		side: THREE.DoubleSide
+    	});
+    }
 
     //let material3 = new THREE.MeshLambertMaterial({
     // 	color: 0xff4444,
@@ -246,8 +260,6 @@ jQuery(document).ready(function() {
             const mesh = new THREE.Mesh(geometry, material);
             mesh.castShadow = true; //default is false
             mesh.receiveShadow = true; //default
-
-            let showWireframe = true;
             if (showWireframe) {
                 const wireframe = new THREE.WireframeGeometry(geometry);
 
@@ -266,14 +278,6 @@ jQuery(document).ready(function() {
 			console.log(error)
 		}
 	)
-
-
-	/*const geometry = new THREE.BoxGeometry();
-	const material2 = new THREE.MeshBasicMaterial({
-		color: 0x00ff00
-	});
-	const cube = new THREE.Mesh(geometry, material2);
-	scene.add(cube);*/
 	animate();
 
 })

@@ -15,3 +15,10 @@ Here an example rendering (using the viewer/ application) that shows the tube ge
 We can now render a video sequence with a spotlight attached to the camera.
 
 ![Video sequence](/images/animation.gif "Video sequence with wireframe and stone")
+
+In the same way that we can render the 'realistic' image we can also render the depth map from the same camera point for both the tube and the stone surface.
+
+Here an example of both the image and its depth map:
+
+![Example rendered with stone](/images/DepthMapLinkedImage.png "Example surface and stone geometry")
+![Corresponding depth map](/images/DepthMap.png "Example depth map (bright mean closer to the camera)")
