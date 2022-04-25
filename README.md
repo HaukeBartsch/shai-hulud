@@ -12,4 +12,4 @@ Here an exmple rendering (using the viewer) that shows the tube geometry (smooth
 
 We can now render a video sequence with a spotlight attached to the camera.
 
-![Video sequence](/images/animage.gif "Video sequence with wireframe and stone")
+![Video sequence](/images/animation.gif "Video sequence with wireframe and stone")
