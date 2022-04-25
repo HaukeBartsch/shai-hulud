@@ -10,4 +10,6 @@ Here an exmple rendering (using the viewer) that shows the tube geometry (smooth
 
 ![Example surface rendered with stone](/images/WormStone.png "Example combined surface and stone geometry")
 
+We can now render a video sequence with a spotlight attached to the camera.
 
+![Video sequence](/images/animage.gif "Video sequence with wireframe and stone")

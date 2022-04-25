@@ -217,7 +217,7 @@ jQuery(document).ready(function() {
     spotLight.target.position.set(0, 0, -1);
     spotLight.position.copy(camera.position);
     const shadowCameraSize = 75;
-    spotLight.castShadow = true;
+    //spotLight.castShadow = true;
     //spotLight.shadow.bias = -0.0001;
     spotLight.shadow.mapSize.width = 1024 * 4;
     spotLight.shadow.mapSize.height = 1024 * 4;
