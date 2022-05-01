@@ -22,3 +22,7 @@ Here an example of both the image and its depth map:
 
 ![Example rendered with stone](/images/DepthMapLinkedImage.png "Example surface and stone geometry")
 ![Corresponding depth map](/images/DepthMap.png "Example depth map (bright mean closer to the camera)")
+
+In order to see the differences in sucdessive runs of the stone generation algorithm here a montage of stone shapes where we only varied the 'numCells' paramater between 30 and 10,000.
+
+![Examples for stone shapes](/images/Stones.png "Examples for stone geometry surfaces")
