@@ -42,8 +42,8 @@ function animate() {
 	//console.log(light.position);
 	//console.log(camera.position);
     if ((tick % 50) == 0) {
-        if (pos < 32)
-        	pos = (pos + 1) % (centerline.length - 1);
+        //if (pos < 32)
+        pos = (pos + 1) % (centerline.length - 1);
         //console.log(spotLight.position);
         //console.log(camera.position);
     }
@@ -151,7 +151,11 @@ jQuery(document).ready(function() {
         			console.log(error)
         		}
         )
-    });
+	});
+	jQuery.getJSON('data/centerlineHR.json', function(data) {
+		centerline = data;
+	});
+
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 	//camera.position.z = 5;
