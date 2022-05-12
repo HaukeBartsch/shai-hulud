@@ -16,6 +16,44 @@ let tick = 0;
 let depthMap = false;
 let showWireframe = true;
 
+// check if the points in array points are inside the mesh
+function validCenterLinePoints(scene, points, mesh) {
+	// return a boolean array of centerline points that are 'valid', e.g. not inside a stone
+	var validPoints = points.map(function(x) {
+		return true;
+	});
+	// find the right geometry in the scene
+	var geomID = -1;
+	for (var i = 0; i < scene.children.length; i++) {
+		if (scene.children[i] == mesh) {
+			geomID = i;
+			break;
+		}
+	}
+	if (geomID == -1) {
+		console.log("Error: Could not find that mesh in the scene.");
+		return;
+	}
+
+	// algorithm is to shoot a ray and count the number of times it intersects with the object
+	// if the number of intersections is odd the point is inside the surface
+	var raycaster = new THREE.Raycaster();
+	for (var j = 0; j < points.length; j++) {
+		raycaster.ray.origin.set(points[j][0], points[j][1], points[j][2]);
+		raycaster.ray.lookAt(new THREE.Vector3(0, 0, 1));
+		const intersects = raycaster.intersectObjects([scene.children[geomID]], false);
+		var counter = 0;
+		for (var i = 0; i < intersects.length; i++) {
+			//if (intersects[i].object == mesh) {
+			counter++;
+			//}
+		}
+		if (counter % 2 != 0) {
+			validPoints[j] = false;
+		}
+	}
+	return validPoints;
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -41,9 +79,17 @@ function animate() {
 	renderer.render(scene, camera);
 	//console.log(light.position);
 	//console.log(camera.position);
-    if ((tick % 50) == 0) {
+    if ((tick % 5) == 0) {
         //if (pos < 32)
-        pos = (pos + 1) % (centerline.length - 1);
+		pos = (pos + 1) % (centerline.length - 1);
+		if (validPoints.length == centerline.length) {
+			// next valid point
+			var tests = 0;
+			while (!validPoints[pos] && tests < centerline.length) {
+				pos = (pos + 1) % (centerline.length - 1);
+				tests++;
+			}
+		}
         //console.log(spotLight.position);
         //console.log(camera.position);
     }
@@ -57,15 +103,20 @@ let controls = null;
 let light = null;
 let material = null;
 let centerline = [];
+let centerlineLR = []; // stone positions are relative to this array
+let centerlineHR = [];
+let validPoints = [];
 let pos = 0;
 let spotLight;
+let stoneMeshes = [];
 //let spotLightHelper;
 let hemiLight;
 
 jQuery(document).ready(function() {
     // read in the line
     jQuery.getJSON('data/centerline.json', function(data) {
-    	centerline = data;
+		centerline = data;
+		centerlineLR = data;
         const loader2 = new STLLoader()
         loader2.load(
         		'data/stone.stl',
@@ -110,39 +161,18 @@ jQuery(document).ready(function() {
         			mesh.castShadow = true; //default is false
         			mesh.receiveShadow = true; //default
         			// move the mesh to a random position inside the tube
-        			jQuery.getJSON('data/stonePositions.json', function(data) {
-        				// move the stone to one of these positions, or to a position between the 
-        				// centerline and the stone position
-        				let pick = 30; // where to place the stone along the centerline
-        				mesh.position.set(
-        					centerline[pick][0] - 0.2 * (data[pick][0] - centerline[pick][0]),
-        						centerline[pick][1] - 0.2 * (data[pick][1] - centerline[pick][1]),
-        						centerline[pick][2] - 0.2 * (data[pick][2] - centerline[pick][2])
-                        );
-                        /*pick = 50;
-                        let mesh2 = mesh.clone();
-                        mesh2.position.set(
-                        	centerline[pick][0] - 0.2 * (data[pick][0] - centerline[pick][0]),
-                        		centerline[pick][1] - 0.2 * (data[pick][1] - centerline[pick][1]),
-                        		centerline[pick][2] - 0.2 * (data[pick][2] - centerline[pick][2])
-                        );
-                        scene.add(mesh2);*/
-                        // add a wireframe geometry to the stone
-                        /*    const wireframe = new THREE.WireframeGeometry(geometry);
-
-                            const line = new THREE.LineSegments(wireframe);
-                            line.material.depthTest = false;
-                            line.material.opacity = 0.25;
-                            line.material.transparent = true;
-                            line.scale.set(0.005, 0.005, 0.005);
-                            line.position.set(centerline[pick][0] - 0.9 * (data[pick][0] - centerline[pick][0]),
-                            	centerline[pick][1] - 0.9 * (data[pick][1] - centerline[pick][1]),
-                            	centerline[pick][2] - 0.9 * (data[pick][2] - centerline[pick][2])
-                            );
-                            scene.add(line);
-                            */
-        			});
-        			scene.add(mesh)
+					(function(mesh) {
+						jQuery.getJSON('data/stonePositions.json', function(data) {
+									// move the stone to one of these positions, or to a position between the 
+									// centerline and the stone position
+									let pick = 30; // where to place the stone along the centerline
+									mesh.position.set(centerlineLR[pick][0] - 0.2 * (data[pick][0] - centerlineLR[pick][0]), centerlineLR[pick][1] - 0.2 * (data[pick][1] - centerlineLR[pick][1]), centerlineLR[pick][2] - 0.2 * (data[pick][2] - centerlineLR[pick][2]));
+									mesh.updateMatrixWorld();
+									scene.add(mesh);
+									stoneMeshes.push(mesh);
+									validPoints = validCenterLinePoints(scene, centerline, stoneMeshes[0]);
+									});
+					})(mesh);
         		},
         		(xhr) => {
         			console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
@@ -153,15 +183,15 @@ jQuery(document).ready(function() {
         )
 	});
 	jQuery.getJSON('data/centerlineHR.json', function(data) {
-		centerline = data;
+		centerline = data; // higher resolution centerline
 	});
 
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 100);
 	//camera.position.z = 5;
 	scene.add(camera);
 
-	scene.add(new THREE.AxesHelper(5))
+	//scene.add(new THREE.AxesHelper(5))
 
 	renderer = new THREE.WebGLRenderer({
         'canvas': document.getElementById('canvas'),
